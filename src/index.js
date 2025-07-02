@@ -192,6 +192,22 @@ const withInspectorControls = createHigherOrderComponent(
 									__nextHasNoMarginBottom
 									label="Roles"
 								></BaseControl>
+								<ToggleControl
+									key="guest"
+									label={`Hide for guest`}
+									checked={bvmUserRoles.includes("guest")}
+									onChange={() => {
+										const newRoles = [...bvmUserRoles];
+										if (newRoles.includes("guest")) {
+											setAttributes({
+												bvmUserRoles: newRoles.filter((r) => r !== "guest"),
+											});
+										} else {
+											newRoles.push("guest");
+											setAttributes({ bvmUserRoles: newRoles });
+										}
+									}}
+								/>
 								{roles.map((role) => (
 									<ToggleControl
 										key={role}

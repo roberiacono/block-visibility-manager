@@ -72,10 +72,14 @@ if (!empty($attributes['bvmHideOnDesktop'])) $classes .= ' hide-desktop';
 
 // User Roles
 if (!empty($attributes['bvmUserRoles'])) {
-    if (!is_user_logged_in()) return;
+    if (!is_user_logged_in()){
+        if ( in_array( 'guest', $attributes['bvmUserRoles'], true ) ) {
+			return ''; // Hide block for guests
+		}
+    } 
     $user = wp_get_current_user();
-    $allowed = array_intersect($attributes['bvmUserRoles'], $user->roles);
-    if (empty($allowed)) return;
+    $blocked = array_intersect($attributes['bvmUserRoles'], $user->roles);
+    if (!empty($blocked)) return;
 }
 
 // Output

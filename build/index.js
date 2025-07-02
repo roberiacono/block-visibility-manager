@@ -213,7 +213,23 @@ const withInspectorControls = (0,_wordpress_compose__WEBPACK_IMPORTED_MODULE_5__
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.__experimentalDivider, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.BaseControl, {
             __nextHasNoMarginBottom: true,
             label: "Roles"
-          }), roles.map(role => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.ToggleControl, {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.ToggleControl, {
+            label: `Hide for guest`,
+            checked: bvmUserRoles.includes("guest"),
+            onChange: () => {
+              const newRoles = [...bvmUserRoles];
+              if (newRoles.includes("guest")) {
+                setAttributes({
+                  bvmUserRoles: newRoles.filter(r => r !== "guest")
+                });
+              } else {
+                newRoles.push("guest");
+                setAttributes({
+                  bvmUserRoles: newRoles
+                });
+              }
+            }
+          }, "guest"), roles.map(role => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.ToggleControl, {
             label: `Hide for ${role}`,
             checked: bvmUserRoles.includes(role),
             onChange: () => {

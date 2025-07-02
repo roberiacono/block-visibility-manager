@@ -30,6 +30,9 @@ function bvm_enqueue_editor_assets() {
 
 	$role_options = bvm_get_all_roles();
 
+	$enabled = get_option( 'bvm_enabled_blocks', array() );
+	wp_localize_script( 'bvm-editor', 'bvmEnabledBlocks', $enabled );
+
 	wp_localize_script(
 		'bvm-editor',
 		'bvmRoleOptions',
@@ -84,3 +87,21 @@ function bvm_enqueue_frontend_css() {
 	wp_enqueue_style( 'bvm-style', plugin_dir_url( __FILE__ ) . 'build/style-index.css', array(), BLOCK_VISIBILITY_MANAGER_PLUGIN_VERSION );
 }
 add_action( 'wp_enqueue_scripts', 'bvm_enqueue_frontend_css' );
+
+
+/**
+ * Include files if they exist.
+ */
+function bvm_include_settings_file() {
+	$file_path_to_includes = array(
+		plugin_dir_path( __FILE__ ) . 'includes/helpers.php',
+		plugin_dir_path( __FILE__ ) . 'includes/settings.php',
+	);
+
+	foreach ( $file_path_to_includes as $file_path ) {
+		if ( file_exists( $file_path ) ) {
+			require_once $file_path;
+		}
+	}
+}
+add_action( 'init', 'bvm_include_settings_file' );

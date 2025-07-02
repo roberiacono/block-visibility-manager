@@ -32,9 +32,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-// Extend attributes
+const allowedBlocks = window.bvmEnabledBlocks;
 
-const addAttributes = settings => {
+// Extend attributes
+const addAttributes = (settings, name) => {
+  if (!allowedBlocks?.includes(name)) {
+    return settings;
+  }
   settings.attributes = {
     ...settings.attributes,
     bvmEnableVisibility: {
@@ -106,6 +110,11 @@ const withInspectorControls = (0,_wordpress_compose__WEBPACK_IMPORTED_MODULE_5__
     bvmDateRange,
     bvmUserRoles
   } = attributes;
+  if (!allowedBlocks?.includes(name)) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(BlockEdit, {
+      ...props
+    });
+  }
   const roles = window.bvmRoleOptions || [];
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(BlockEdit, {

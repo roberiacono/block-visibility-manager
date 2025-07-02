@@ -16,31 +16,39 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+
+define( 'BLOCK_VISIBILITY_MANAGER_PLUGIN_VERSION', '1.0.0' );
+
+/** Enqueue editor assets */
 function bvm_enqueue_editor_assets() {
-    wp_enqueue_script(
-        'bvm-editor',
-        plugin_dir_url(__FILE__) . 'build/index.js',
-        [ 'wp-blocks', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data' ],
-        filemtime(__DIR__ . '/build/index.js')
-    );
+	wp_enqueue_script(
+		'bvm-editor',
+		plugin_dir_url( __FILE__ ) . 'build/index.js',
+		array( 'wp-blocks', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data' ),
+		filemtime( __DIR__ . '/build/index.js' )
+	);
 }
-add_action('enqueue_block_editor_assets', 'bvm_enqueue_editor_assets');
+add_action( 'enqueue_block_editor_assets', 'bvm_enqueue_editor_assets' );
 
-function bvm_filter_render_block($block_content, $block) {
-    if (
-        empty($block['attrs']['bvmEnableVisibility']) ||
-        !apply_filters('bvm_should_render', true, $block['attrs'])
-    ) {
-        return $block_content;
-    }
+/** Add render.php for dynamic block */
+function bvm_filter_render_block( $block_content, $block ) {
+	if (
+		empty( $block['attrs']['bvmEnableVisibility'] ) ||
+		! apply_filters( 'bvm_should_render', true, $block['attrs'] )
+	) {
+		return $block_content;
+	}
 
-    ob_start();
-    include __DIR__ . '/render.php';
-    return ob_get_clean();
+	ob_start();
+	include __DIR__ . '/render.php';
+	return ob_get_clean();
 }
-add_filter('render_block', 'bvm_filter_render_block', 10, 2);
+add_filter( 'render_block', 'bvm_filter_render_block', 10, 2 );
 
+/**
+ * Enqueue frontend styles for the block.
+ */
 function bvm_enqueue_frontend_css() {
-    wp_enqueue_style('bvm-style', plugin_dir_url(__FILE__) . 'build/style-index.css');
+	wp_enqueue_style( 'bvm-style', plugin_dir_url( __FILE__ ) . 'build/style-index.css', array(), BLOCK_VISIBILITY_MANAGER_PLUGIN_VERSION );
 }
-add_action('wp_enqueue_scripts', 'bvm_enqueue_frontend_css');
+add_action( 'wp_enqueue_scripts', 'bvm_enqueue_frontend_css' );

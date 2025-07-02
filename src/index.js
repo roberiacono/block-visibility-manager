@@ -16,14 +16,8 @@ import {
 import { createHigherOrderComponent } from "@wordpress/compose";
 import { select } from "@wordpress/data";
 
-const allowedBlocks = ["core/group"];
-
 // Extend attributes
-const addAttributes = (settings, name) => {
-	if (!allowedBlocks.includes(name)) {
-		return settings;
-	}
-
+const addAttributes = (settings) => {
 	settings.attributes = {
 		...settings.attributes,
 		bvmEnableVisibility: { type: "boolean", default: false },
@@ -65,10 +59,6 @@ const withInspectorControls = createHigherOrderComponent(
 			bvmDateRange,
 			bvmUserRoles,
 		} = attributes;
-
-		if (!allowedBlocks.includes(name)) {
-			return <BlockEdit {...props} />;
-		}
 
 		const roles = window.bvmRoleOptions || [];
 

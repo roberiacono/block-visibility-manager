@@ -1,0 +1,22 @@
+/**
+ * The following styles get applied both on the front of your site
+ * and in the editor.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+
+/* .wp-block-create-block-block-visibility-manager {
+	background-color: #21759b;
+	color: #fff;
+	padding: 2px;
+} */
+
+@media only screen and (max-width: 767px) {
+    .hide-mobile { display: none !important; }
+}
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .hide-tablet { display: none !important; }
+}
+@media only screen and (min-width: 1025px) {
+    .hide-desktop { display: none !important; }
+}

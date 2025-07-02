@@ -27,10 +27,42 @@ function bvm_enqueue_editor_assets() {
 		array( 'wp-blocks', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data' ),
 		filemtime( __DIR__ . '/build/index.js' )
 	);
+
+	$role_options = bvm_get_all_roles();
+
+	wp_localize_script(
+		'bvm-editor',
+		'bvmRoleOptions',
+		$role_options
+	);
 }
 add_action( 'enqueue_block_editor_assets', 'bvm_enqueue_editor_assets' );
 
-/** Add render.php for dynamic block */
+/**
+ * Get all WP Roles.
+ */
+function bvm_get_all_roles() {
+	$roles        = wp_roles()->roles;
+	$role_options = array();
+
+	foreach ( $roles as $role_slug => $role_details ) {
+		$role_options[] = array(
+			'label' => $role_details['name'],
+			'value' => $role_slug,
+		);
+	}
+
+	return $role_options;
+}
+
+/**
+ * Processes and renders a block.
+ *
+ * @param string $block_content The content of the block to be processed.
+ * @param array  $block An associative array containing block information.
+ *
+ * @return string The processed block content.
+ */
 function bvm_filter_render_block( $block_content, $block ) {
 	if (
 		empty( $block['attrs']['bvmEnableVisibility'] ) ||

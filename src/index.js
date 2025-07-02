@@ -14,9 +14,16 @@ import {
 	BaseControl,
 } from "@wordpress/components";
 import { createHigherOrderComponent } from "@wordpress/compose";
+import { select } from "@wordpress/data";
+
+const allowedBlocks = ["core/group"];
 
 // Extend attributes
-const addAttributes = (settings) => {
+const addAttributes = (settings, name) => {
+	if (!allowedBlocks.includes(name)) {
+		return settings;
+	}
+
 	settings.attributes = {
 		...settings.attributes,
 		bvmEnableVisibility: { type: "boolean", default: false },
@@ -59,28 +66,24 @@ const withInspectorControls = createHigherOrderComponent(
 			bvmUserRoles,
 		} = attributes;
 
-		console.log("bvmTimeRange", bvmTimeRange);
+		if (!allowedBlocks.includes(name)) {
+			return <BlockEdit {...props} />;
+		}
 
-		const roles = [
-			"administrator",
-			"editor",
-			"author",
-			"contributor",
-			"subscriber",
-		];
-
-		console.log("attributes", attributes);
+		const roles = window.bvmRoleOptions || [];
 
 		return (
 			<Fragment>
 				<BlockEdit {...props} />
 				<InspectorControls>
 					<PanelBody title="Visibility Manager" initialOpen={false}>
-						<ToggleControl
-							label="Enable Custom Visibility"
-							checked={bvmEnableVisibility}
-							onChange={(val) => setAttributes({ bvmEnableVisibility: val })}
-						/>
+						<div style={{ marginTop: "16px" }}>
+							<ToggleControl
+								label="Enable Custom Visibility"
+								checked={bvmEnableVisibility}
+								onChange={(val) => setAttributes({ bvmEnableVisibility: val })}
+							/>
+						</div>
 						{bvmEnableVisibility && (
 							<>
 								<Divider />
@@ -113,7 +116,7 @@ const withInspectorControls = createHigherOrderComponent(
 								{attributes.bvmEnableTime && (
 									<>
 										<TimePicker.TimeInput
-											label="Time From"
+											label="Visible From"
 											value={bvmTimeRange.from}
 											onChange={(val) =>
 												setAttributes({
@@ -127,7 +130,7 @@ const withInspectorControls = createHigherOrderComponent(
 										/>
 
 										<TimePicker.TimeInput
-											label="Time To"
+											label="Visible up To"
 											value={bvmTimeRange.to}
 											onChange={(val) => {
 												console.log("changed", val);
@@ -151,9 +154,7 @@ const withInspectorControls = createHigherOrderComponent(
 								/>
 								{attributes.bvmEnableDate && (
 									<>
-										<PanelRow>
-											Will be visible <strong>From</strong>:
-										</PanelRow>
+										<PanelRow>Will be visible From:</PanelRow>
 										<DatePicker
 											currentDate={
 												bvmDateRange.from ||
@@ -168,9 +169,7 @@ const withInspectorControls = createHigherOrderComponent(
 												})
 											}
 										/>
-										<PanelRow>
-											Will be visible up <strong>To</strong>:
-										</PanelRow>
+										<PanelRow>Will be visible up To:</PanelRow>
 										<DatePicker
 											currentDate={
 												bvmDateRange.to ||
@@ -194,7 +193,7 @@ const withInspectorControls = createHigherOrderComponent(
 								></BaseControl>
 								<ToggleControl
 									key="guest"
-									label={`Hide for guest`}
+									label={`Hide for Guest`}
 									checked={bvmUserRoles.includes("guest")}
 									onChange={() => {
 										const newRoles = [...bvmUserRoles];
@@ -210,17 +209,19 @@ const withInspectorControls = createHigherOrderComponent(
 								/>
 								{roles.map((role) => (
 									<ToggleControl
-										key={role}
-										label={`Hide for ${role}`}
-										checked={bvmUserRoles.includes(role)}
+										key={role.value}
+										label={`Hide for ${role.label}`}
+										checked={bvmUserRoles.includes(role.value)}
 										onChange={() => {
 											const newRoles = [...bvmUserRoles];
-											if (newRoles.includes(role)) {
+											if (newRoles.includes(role.value)) {
 												setAttributes({
-													bvmUserRoles: newRoles.filter((r) => r !== role),
+													bvmUserRoles: newRoles.filter(
+														(r) => r !== role.value,
+													),
 												});
 											} else {
-												newRoles.push(role);
+												newRoles.push(role.value);
 												setAttributes({ bvmUserRoles: newRoles });
 											}
 										}}

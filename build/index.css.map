@@ -1,0 +1,1 @@
+{"version":3,"file":"index.css","mappings":";;;AACA;EACI;AAAJ,C","sources":["webpack://block-visibility-manager/./src/editor.scss"],"sourcesContent":["\r\n.components-base-control.components-input-control.components-number-control.components-datetime__time-field.components-datetime__time-field-day {\r\n    margin: 0;\r\n}\r\n "],"names":[],"sourceRoot":""}

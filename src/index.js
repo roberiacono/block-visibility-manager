@@ -1,4 +1,5 @@
 import "./style.scss";
+import "./editor.scss";
 
 import { addFilter } from "@wordpress/hooks";
 import { Fragment } from "@wordpress/element";
@@ -10,6 +11,7 @@ import {
 	TextControl,
 	TimePicker,
 	DatePicker,
+	DateTimePicker,
 	__experimentalDivider as Divider,
 	BaseControl,
 } from "@wordpress/components";
@@ -155,7 +157,21 @@ const withInspectorControls = createHigherOrderComponent(
 								{attributes.bvmEnableDate && (
 									<>
 										<PanelRow>Will be visible From:</PanelRow>
-										<DatePicker
+
+										<DateTimePicker
+											currentDate={bvmDateRange.from || new Date()}
+											onChange={(newDate) =>
+												setAttributes({
+													bvmDateRange: {
+														...bvmDateRange,
+														from: newDate,
+													},
+												})
+											}
+											is12Hour={false}
+										/>
+
+										{/* <DatePicker
 											currentDate={
 												bvmDateRange.from ||
 												new Date().toISOString().split("T")[0]
@@ -168,9 +184,9 @@ const withInspectorControls = createHigherOrderComponent(
 													},
 												})
 											}
-										/>
+										/> */}
 										<PanelRow>Will be visible up To:</PanelRow>
-										<DatePicker
+										{/* <DatePicker
 											currentDate={
 												bvmDateRange.to ||
 												new Date().toISOString().split("T")[0]
@@ -183,7 +199,7 @@ const withInspectorControls = createHigherOrderComponent(
 													},
 												})
 											}
-										/>
+										/> */}
 									</>
 								)}
 								<Divider />

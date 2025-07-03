@@ -30,12 +30,7 @@ function bvm_enqueue_editor_assets() {
 
 	$role_options = bvm_get_all_roles();
 
-	// $enabled = get_option( 'bvm_enabled_blocks', array() ); // bvm_get_enabled_blocks(); // get_option( 'bvm_enabled_blocks', array() );
 	$enabled = bvm_get_enabled_blocks();
-
-	/*
-	error_log( print_r( $enabled, true ) );
-	error_log( print_r( bvm_get_enabled_blocks(), true ) ); */
 
 	wp_localize_script( 'bvm-editor', 'bvmEnabledBlocks', $enabled );
 
@@ -43,6 +38,13 @@ function bvm_enqueue_editor_assets() {
 		'bvm-editor',
 		'bvmRoleOptions',
 		$role_options
+	);
+
+	wp_enqueue_style(
+		'bvm-editor-styles',
+		plugins_url( 'build/index.css', __FILE__ ),
+		array( 'wp-edit-blocks' ),
+		filemtime( plugin_dir_path( __FILE__ ) . 'build/index.css' )
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'bvm_enqueue_editor_assets' );

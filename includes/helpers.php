@@ -5,8 +5,6 @@
  * @package BlockVisibilityManager
  */
 
-
-
 /**
  * Get all registered block types grouped by namespace.
  */
@@ -34,11 +32,6 @@ function bvm_group_blocks_by_category() {
 	$categories = bvm_get_block_category_map();
 	$grouped    = array();
 
-	/*
-	echo '<pre>';
-	print_r( $blocks );
-	echo '</pre>';
-	*/
 	foreach ( $blocks as $block_name => $block ) {
 		// Skip if not shown in Inserter.
 		if ( isset( $block->supports['inserter'] ) && false === $block->supports['inserter'] ) {

@@ -48,31 +48,6 @@ function block_visibility_manager_render_settings_page() {
 		echo '<div class="updated"><p>Settings saved.</p></div>';
 	}
 
-	echo '<style>
-	.block-visibility-manager-card-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-		gap: 16px;
-	}
-	.block-visibility-manager-card {
-		border: 1px solid #ccc;
-		border-radius: 6px;
-		padding: 12px;
-		background: #fff;
-		box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-	}
-	.block-visibility-manager-card h4 {
-		margin: 0 0 6px;
-		font-size: 16px;
-	}
-	.block-visibility-manager-card label {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		font-size: 14px;
-	}
-</style>';
-
 	$grouped_blocks = block_visibility_manager_group_blocks_by_category();
 	$category_map   = block_visibility_manager_get_block_category_map();
 	$saved_blocks   = get_option( 'block_visibility_manager_disabled_blocks', null );
@@ -84,38 +59,51 @@ function block_visibility_manager_render_settings_page() {
 		$disabled_blocks = $saved_blocks;
 	}
 
-	echo '<div class="wrap">';
-	echo '<h1>Block Visibility Settings</h1>';
-	echo '<form method="post">';
-	wp_nonce_field( 'block_visibility_manager_save_settings' );
+	?>
+	<div class="wrap">
+		<h1><?php esc_html_e( 'Block Visibility Settings', 'block-visibility-manager' ); ?></h1>
+		<p class="description"><?php esc_html_e( 'Control which blocks include the visibility option.', 'block-visibility-manager' ); ?></p>
+		<form method="post">
+			<?php wp_nonce_field( 'block_visibility_manager_save_settings' ); ?>
 
-	foreach ( $category_map as $slug => $label ) {
-		if ( empty( $grouped_blocks[ $slug ] ) ) {
-			continue;
-		}
+			<?php foreach ( $category_map as $slug => $label ) : ?>
+				<?php
+				if ( empty( $grouped_blocks[ $slug ] ) ) {
+					continue;}
+				?>
+				<h2><?php echo esc_html( $label ); ?></h2>
+				<div class="block-visibility-manager-card-grid">
+					<?php foreach ( $grouped_blocks[ $slug ] as $block_name => $data ) : ?>
+						<?php $is_enabled = ! in_array( $block_name, $disabled_blocks, true ); ?>
+						<div class="block-visibility-manager-card">
+							<h4><?php echo esc_html( $data['title'] ); ?></h4>
+							<label>
+								<input
+									type="checkbox"
+									name="block_visibility_manager_enabled_blocks[]"
+									value="<?php echo esc_attr( $block_name ); ?>"
+									<?php checked( $is_enabled ); ?>
+								/>
+								<?php esc_html_e( 'Enable', 'block-visibility-manager' ); ?>
+							</label>
+						</div>
+					<?php endforeach; ?>
+				</div>
+			<?php endforeach; ?>
 
-		echo '<h2>' . esc_html( $label ) . '</h2>';
-		echo '<div class="block-visibility-manager-card-grid">';
-
-		foreach ( $grouped_blocks[ $slug ] as $block_name => $data ) {
-			$is_enabled = ! in_array( $block_name, $disabled_blocks, true );
-			echo '<div class="block-visibility-manager-card">';
-			echo '<h4>' . esc_html( $data['title'] ) . '</h4>';
-			echo '<label>';
-			echo '<input type="checkbox" name="block_visibility_manager_enabled_blocks[]" value="' . esc_attr( $block_name ) . '" ' . checked( $is_enabled, true, false ) . ' />';
-			echo ' Enable';
-			echo '</label>';
-			echo '</div>';
-		}
-
-		echo '</div>';
-	}
-
-	echo '<div style="display: flex; gap: 0.5rem;">';
-	submit_button( 'Save Settings', 'primary', 'block_visibility_manager_save' );
-
-	echo '<p class="submit"><input type="submit" name="block_visibility_manager_reset" id="block_visibility_manager_reset" class="button button-secondary" value="Reset to Default" onclick="return confirm(\'Are you sure you want to reset to default ? \');"></p>';
-		echo '</div>';
-		echo '</form>';
-		echo '</div>';
+			<div style="display: flex; gap: 0.5rem;">
+			<?php submit_button( esc_html__( 'Save Settings', 'block-visibility-manager' ), 'primary', 'block_visibility_manager_save' ); ?>
+				<p class="submit">
+					<input
+						type="submit"
+						name="block_visibility_manager_reset"
+						class="button button-secondary"
+						value="<?php esc_attr_e( 'Reset to Default', 'block-visibility-manager' ); ?>"
+						onclick="return confirm('<?php echo esc_js( __( 'Are you sure you want to reset to default?', 'block-visibility-manager' ) ); ?>');"
+					/>
+				</p>
+			</div>
+		</form>
+	</div>
+	<?php
 }

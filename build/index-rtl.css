@@ -4,3 +4,28 @@
 .components-base-control.components-input-control.components-number-control.components-datetime__time-field.components-datetime__time-field-day {
   margin: 0;
 }
+/*!*******************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./src/admin.css ***!
+  \*******************************************************************************************************************************************************************/
+.block-visibility-manager-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+.block-visibility-manager-card {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 12px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.block-visibility-manager-card h4 {
+    margin: 0 0 6px;
+    font-size: 16px;
+}
+.block-visibility-manager-card label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}

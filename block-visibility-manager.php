@@ -33,7 +33,11 @@ function block_visibility_manager_enqueue_editor_assets() {
 
 	$enabled = block_visibility_manager_get_enabled_blocks();
 
-	wp_localize_script( 'block-visibility-manager-editor', 'bvmEnabledBlocks', $enabled );
+	wp_localize_script(
+		'block-visibility-manager-editor',
+		'bvmEnabledBlocks',
+		$enabled
+	);
 
 	wp_localize_script(
 		'block-visibility-manager-editor',
@@ -49,7 +53,6 @@ function block_visibility_manager_enqueue_editor_assets() {
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'block_visibility_manager_enqueue_editor_assets' );
-
 
 
 /**
@@ -157,6 +160,25 @@ function block_visibility_manager_enqueue_frontend_css() {
 	wp_enqueue_style( 'block-visibility-manager-style', plugin_dir_url( __FILE__ ) . 'build/style-index.css', array(), BLOCK_VISIBILITY_MANAGER_PLUGIN_VERSION );
 }
 add_action( 'wp_enqueue_scripts', 'block_visibility_manager_enqueue_frontend_css' );
+
+
+add_action( 'admin_enqueue_scripts', 'block_visibility_manager_enqueue_admin_styles' );
+/**
+ * Enqueue admin styles for the Block Visibility Manager settings page.
+ *
+ * @param string $hook The current admin page hook suffix.
+ */
+function block_visibility_manager_enqueue_admin_styles( $hook ) {
+	if ( 'settings_page_block-visibility-manager-settings' !== $hook ) {
+		return;
+	}
+	wp_enqueue_style(
+		'block-visibility-manager-admin-styles',
+		plugin_dir_url( __FILE__ ) . 'build/index.css',
+		array(),
+		'1.0'
+	);
+}
 
 
 /**

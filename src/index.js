@@ -1,5 +1,6 @@
 import "./style.scss";
 import "./editor.scss";
+import "./admin.css";
 
 import { addFilter } from "@wordpress/hooks";
 import { Fragment } from "@wordpress/element";

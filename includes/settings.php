@@ -66,13 +66,13 @@ function bvm_render_settings_page() {
 
 	$grouped_blocks = bvm_group_blocks_by_category();
 	$category_map   = bvm_get_block_category_map();
-	$saved_blocks   = get_option( 'bvm_enabled_blocks', null );
+	$saved_blocks   = get_option( 'bvm_disabled_blocks', null );
 
 	if ( is_null( $saved_blocks ) ) {
 		// First time, use defaults.
-		$enabled_blocks = bvm_get_default_enabled_blocks();
+		$disabled_blocks = bvm_get_default_disabled_blocks();
 	} else {
-		$enabled_blocks = $saved_blocks;
+		$disabled_blocks = $saved_blocks;
 	}
 
 	echo '<div class="wrap">';
@@ -89,10 +89,11 @@ function bvm_render_settings_page() {
 		echo '<div class="bvm-card-grid">';
 
 		foreach ( $grouped_blocks[ $slug ] as $block_name => $data ) {
+			$is_enabled = ! in_array( $block_name, $disabled_blocks, true );
 			echo '<div class="bvm-card">';
 			echo '<h4>' . esc_html( $data['title'] ) . '</h4>';
 			echo '<label>';
-			echo '<input type="checkbox" name="bvm_enabled_blocks[]" value="' . esc_attr( $block_name ) . '" ' . checked( in_array( $block_name, $enabled_blocks ), true, false ) . ' />';
+			echo '<input type="checkbox" name="bvm_enabled_blocks[]" value="' . esc_attr( $block_name ) . '" ' . checked( $is_enabled, true, false ) . ' />';
 			echo ' Enable';
 			echo '</label>';
 			echo '</div>';

@@ -105,3 +105,14 @@ function bvm_include_settings_file() {
 	}
 }
 add_action( 'init', 'bvm_include_settings_file' );
+
+
+register_activation_hook( __FILE__, 'bvm_set_default_disabled_blocks' );
+/**
+ * Set default enabled blocks on plugin activation.
+ */
+function bvm_set_default_disabled_blocks() {
+	if ( get_option( 'bvm_disabled_blocks', null ) === null ) {
+		update_option( 'bvm_disabled_blocks', bvm_get_default_disabled_blocks() );
+	}
+}

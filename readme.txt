@@ -106,10 +106,12 @@ No. It uses **WordPress core components** and no custom frontend JavaScript.
 
 == Screenshots ==
 
-1. Visibility options available inside block settings.
-2. Admin panel to enable or disable visibility support per block.
-3. Example: Set a block to show only during a specific date/time range.
-4. Example: Set a block to show everyday only during a specific time range, and hide it on mobile.
+1. Block Visibility Manager in action.
+2. Visibility options available inside block settings.
+3. Admin panel to enable or disable visibility support per block.
+4. Example: Set a block to show only during a specific date/time range.
+5. Example: Set a block to show everyday only during a specific time range, and hide it on mobile.
+6. Example: Hide banner on mobile.
 
 == Changelog ==
 

@@ -8,7 +8,7 @@
 /**
  * Get all registered block types grouped by namespace.
  */
-function bvm_group_block_types_by_namespace() {
+function block_visibility_manager_group_block_types_by_namespace() {
 	$blocks  = WP_Block_Type_Registry::get_instance()->get_all_registered();
 	$grouped = array();
 
@@ -27,9 +27,9 @@ function bvm_group_block_types_by_namespace() {
 /**
  * Group blocks by category.
  */
-function bvm_group_blocks_by_category() {
+function block_visibility_manager_group_blocks_by_category() {
 	$blocks     = WP_Block_Type_Registry::get_instance()->get_all_registered();
-	$categories = bvm_get_block_category_map();
+	$categories = block_visibility_manager_get_block_category_map();
 	$grouped    = array();
 
 	foreach ( $blocks as $block_name => $block ) {
@@ -54,9 +54,9 @@ function bvm_group_blocks_by_category() {
 /**
  * Get all registered block types to display in settings.
  */
-function bvm_get_all_blocks_in_settings() {
+function block_visibility_manager_get_all_blocks_in_settings() {
 	$blocks                       = WP_Block_Type_Registry::get_instance()->get_all_registered();
-	$categories                   = bvm_get_block_category_map();
+	$categories                   = block_visibility_manager_get_block_category_map();
 	$avaliable_blocks_in_settings = array();
 
 	foreach ( $blocks as $block_name => $block ) {
@@ -73,7 +73,7 @@ function bvm_get_all_blocks_in_settings() {
 /**
  * Get block category map.
  */
-function bvm_get_block_category_map() {
+function block_visibility_manager_get_block_category_map() {
 	return array(
 		'text'    => 'Text',
 		'media'   => 'Media',
@@ -88,7 +88,7 @@ function bvm_get_block_category_map() {
 /**
  * Get default disabled blocks.
  */
-function bvm_get_default_disabled_blocks() {
+function block_visibility_manager_get_default_disabled_blocks() {
 	return array(
 		'core/freeform',
 		'core/navigation-submenu',
@@ -142,9 +142,27 @@ function bvm_get_default_disabled_blocks() {
 /**
  * Get enabled blocks.
  */
-function bvm_get_enabled_blocks() {
-	$all_blocks_in_settings = bvm_get_all_blocks_in_settings();
-	$disabled_blocks        = get_option( 'bvm_disabled_blocks', array() );
+function block_visibility_manager_get_enabled_blocks() {
+	$all_blocks_in_settings = block_visibility_manager_get_all_blocks_in_settings();
+	$disabled_blocks        = get_option( 'block_visibility_manager_disabled_blocks', array() );
 	$enabled_blocks         = array_values( array_diff( $all_blocks_in_settings, $disabled_blocks ) ); // To use array_diff() but preserve a continuous, zero-based index, you just need to wrap the result in array_values()..
 	return $enabled_blocks;
+}
+
+
+/**
+ * Get all WP Roles.
+ */
+function block_visibility_manager_get_all_roles() {
+	$roles        = wp_roles()->roles;
+	$role_options = array();
+
+	foreach ( $roles as $role_slug => $role_details ) {
+		$role_options[] = array(
+			'label' => $role_details['name'],
+			'value' => $role_slug,
+		);
+	}
+
+	return $role_options;
 }

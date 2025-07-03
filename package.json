@@ -1,8 +1,8 @@
 {
 	"name": "block-visibility-manager",
 	"version": "0.1.0",
-	"description": "Example block scaffolded with Create Block tool.",
-	"author": "The WordPress Contributors",
+	"description": "Control the visibility of Gutenberg blocks based on user role, device type, date, time, and more.",
+	"author": "Roberto Iacono",
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
 	"scripts": {

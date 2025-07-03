@@ -43,8 +43,8 @@ const addAttributes = (settings, name) => {
 		bvmTimeRange: {
 			type: "object",
 			default: {
-				from: { hours: 12, minutes: 0 },
-				to: { hours: 18, minutes: 0 },
+				from: { hours: 0, minutes: 0 },
+				to: { hours: 23, minutes: 59 },
 			},
 		},
 		bvmDateRange: { type: "object", default: { from: "", to: "" } },
@@ -156,7 +156,16 @@ const withInspectorControls = createHigherOrderComponent(
 								/>
 								{attributes.bvmEnableDate && (
 									<>
-										<PanelRow>Will be visible From:</PanelRow>
+										<PanelRow>
+											<div
+												style={{
+													marginBottom: "8px",
+													fontWeight: 500,
+												}}
+											>
+												Will be visible From:
+											</div>
+										</PanelRow>
 
 										<DateTimePicker
 											currentDate={bvmDateRange.from || new Date()}
@@ -171,26 +180,19 @@ const withInspectorControls = createHigherOrderComponent(
 											is12Hour={false}
 										/>
 
-										{/* <DatePicker
-											currentDate={
-												bvmDateRange.from ||
-												new Date().toISOString().split("T")[0]
-											}
-											onChange={(val) =>
-												setAttributes({
-													bvmDateRange: {
-														...bvmDateRange,
-														from: val,
-													},
-												})
-											}
-										/> */}
-										<PanelRow>Will be visible up To:</PanelRow>
-										{/* <DatePicker
-											currentDate={
-												bvmDateRange.to ||
-												new Date().toISOString().split("T")[0]
-											}
+										<PanelRow>
+											<div
+												style={{
+													marginTop: "16px",
+													marginBottom: "8px",
+													fontWeight: 500,
+												}}
+											>
+												Will be visible up To:
+											</div>
+										</PanelRow>
+										<DateTimePicker
+											currentDate={bvmDateRange.to || null}
 											onChange={(val) =>
 												setAttributes({
 													bvmDateRange: {
@@ -199,7 +201,8 @@ const withInspectorControls = createHigherOrderComponent(
 													},
 												})
 											}
-										/> */}
+											is12Hour={false}
+										/>
 									</>
 								)}
 								<Divider />

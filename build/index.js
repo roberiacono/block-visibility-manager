@@ -83,12 +83,12 @@ const addAttributes = (settings, name) => {
       type: "object",
       default: {
         from: {
-          hours: 12,
+          hours: 0,
           minutes: 0
         },
         to: {
-          hours: 18,
-          minutes: 0
+          hours: 23,
+          minutes: 59
         }
       }
     },
@@ -215,7 +215,13 @@ const withInspectorControls = (0,_wordpress_compose__WEBPACK_IMPORTED_MODULE_6__
             })
           }), attributes.bvmEnableDate && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.PanelRow, {
-              children: "Will be visible From:"
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
+                style: {
+                  marginBottom: "8px",
+                  fontWeight: 500
+                },
+                children: "Will be visible From:"
+              })
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.DateTimePicker, {
               currentDate: bvmDateRange.from || new Date(),
               onChange: newDate => setAttributes({
@@ -226,7 +232,23 @@ const withInspectorControls = (0,_wordpress_compose__WEBPACK_IMPORTED_MODULE_6__
               }),
               is12Hour: false
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.PanelRow, {
-              children: "Will be visible up To:"
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
+                style: {
+                  marginTop: "16px",
+                  marginBottom: "8px",
+                  fontWeight: 500
+                },
+                children: "Will be visible up To:"
+              })
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.DateTimePicker, {
+              currentDate: bvmDateRange.to || null,
+              onChange: val => setAttributes({
+                bvmDateRange: {
+                  ...bvmDateRange,
+                  to: val
+                }
+              }),
+              is12Hour: false
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.__experimentalDivider, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.BaseControl, {
             __nextHasNoMarginBottom: true,

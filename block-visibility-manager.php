@@ -110,23 +110,17 @@ function bvm_filter_render_block( $block_content, $block ) {
 
 	// Date.
 	if ( ! empty( $attributes['bvmEnableDate'] ) && $attributes['bvmEnableDate'] ) {
-		$today = new DateTime( current_time( 'Y-m-d' ) );
+		$today = new DateTime( current_time( 'Y-m-d H:i:s' ) );
 
 		$date_from_str = $attributes['bvmDateRange']['from'] ?? null;
 		$date_to_str   = $attributes['bvmDateRange']['to'] ?? null;
 
 		if ( $date_from_str && $date_to_str ) {
-			// Remove milliseconds or invalid parts, or use only the date portion.
-			$date_from_str = substr( $date_from_str, 0, 10 ); // "2025-07-12"
-			$date_from     = new DateTime( $date_from_str );
+			$date_from = new DateTime( $date_from_str );
+			$date_to   = new DateTime( $date_to_str );
 
-			$date_to_str = substr( $date_to_str, 0, 10 ); // "2025-07-12"
-			$date_to     = new DateTime( $date_to_str );
-
-			if ( $date_from && $date_to ) {
-				if ( $today < $date_from || $today > $date_to ) {
-					$visible = false;
-				}
+			if ( $today < $date_from || $today > $date_to ) {
+				$visible = false;
 			}
 		}
 	}

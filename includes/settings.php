@@ -34,8 +34,11 @@ function bvm_render_settings_page() {
 	}
 
 	if ( isset( $_POST['bvm_save'] ) && check_admin_referer( 'bvm_save_settings' ) ) {
-		$enabled_blocks = isset( $_POST['bvm_enabled_blocks'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['bvm_enabled_blocks'] ) ) : array();
-		update_option( 'bvm_enabled_blocks', $enabled_blocks );
+		$enabled_blocks  = isset( $_POST['bvm_enabled_blocks'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['bvm_enabled_blocks'] ) ) : array();
+		$all_blocks      = bvm_get_all_blocks_in_settings();
+		$disabled_blocks = array_diff( $all_blocks, $enabled_blocks );
+
+		update_option( 'bvm_disabled_blocks', $disabled_blocks );
 		echo '<div class="updated"><p>Settings saved.</p></div>';
 	}
 

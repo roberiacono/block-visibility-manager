@@ -33,6 +33,12 @@ function bvm_render_settings_page() {
 		return;
 	}
 
+	if ( isset( $_POST['bvm_reset'] ) && check_admin_referer( 'bvm_save_settings' ) ) {
+		// Reset: Empty list means all blocks are enabled (default disabled mode).
+		update_option( 'bvm_disabled_blocks', bvm_get_default_disabled_blocks() );
+		echo '<div class="updated"><p>Settings reset to default (all enabled).</p></div>';
+	}
+
 	if ( isset( $_POST['bvm_save'] ) && check_admin_referer( 'bvm_save_settings' ) ) {
 		$enabled_blocks  = isset( $_POST['bvm_enabled_blocks'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['bvm_enabled_blocks'] ) ) : array();
 		$all_blocks      = bvm_get_all_blocks_in_settings();
@@ -105,7 +111,11 @@ function bvm_render_settings_page() {
 		echo '</div>';
 	}
 
+	echo '<div style="display: flex; gap: 0.5rem;">';
 	submit_button( 'Save Settings', 'primary', 'bvm_save' );
-	echo '</form>';
-	echo '</div>';
+
+	echo '<p class="submit"><input type="submit" name="bvm_reset" id="bvm_reset" class="button button-secondary" value="Reset to Default" onclick="return confirm(\'Are you sure you want to reset to default ? \');"></p>';
+		echo '</div>';
+		echo '</form>';
+		echo '</div>';
 }

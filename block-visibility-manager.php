@@ -192,6 +192,19 @@ function block_visibility_manager_enqueue_admin_styles( $hook ) {
 }
 
 
+/**
+ * Add Settings link on the Plugins page.
+ *
+ * @param array $links Existing action links.
+ * @return array
+ */
+function block_visibility_manager_plugin_action_links( $links ) {
+	$settings_link = '<a href="' . esc_url( admin_url( 'options-general.php?page=block-visibility-manager-settings' ) ) . '">' . esc_html__( 'Settings', 'block-visibility-manager' ) . '</a>';
+	array_unshift( $links, $settings_link );
+	return $links;
+}
+add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'block_visibility_manager_plugin_action_links' );
+
 register_activation_hook( __FILE__, 'block_visibility_manager_set_default_disabled_blocks' );
 /**
  * Set default enabled blocks on plugin activation.

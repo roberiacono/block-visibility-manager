@@ -24,22 +24,21 @@ function block_visibility_manager_register_settings_page() {
 }
 
 /**
- * Retrieves all registered block types.
- *
- * @return array Array of block names and titles.
+ * Renders the settings page and handles form submissions.
  */
 function block_visibility_manager_render_settings_page() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
 
-	if ( isset( $_POST['block_visibility_manager_reset'] ) && check_admin_referer( 'block_visibility_manager_save_settings' ) ) {
-		// Reset: Empty list means all blocks are enabled (default disabled mode).
+	if ( isset( $_POST['block_visibility_manager_reset'] ) ) {
+		check_admin_referer( 'bvm_reset_settings', 'bvm_reset_nonce' );
 		update_option( 'block_visibility_manager_disabled_blocks', block_visibility_manager_get_default_disabled_blocks() );
 		echo '<div class="updated"><p>Settings reset to default (all enabled).</p></div>';
 	}
 
-	if ( isset( $_POST['block_visibility_manager_save'] ) && check_admin_referer( 'block_visibility_manager_save_settings' ) ) {
+	if ( isset( $_POST['block_visibility_manager_save'] ) ) {
+		check_admin_referer( 'bvm_save_settings', 'bvm_save_nonce' );
 		$enabled_blocks  = isset( $_POST['block_visibility_manager_enabled_blocks'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['block_visibility_manager_enabled_blocks'] ) ) : array();
 		$all_blocks      = block_visibility_manager_get_all_blocks_in_settings();
 		$disabled_blocks = array_diff( $all_blocks, $enabled_blocks );
@@ -52,19 +51,19 @@ function block_visibility_manager_render_settings_page() {
 	$category_map   = block_visibility_manager_get_block_category_map();
 	$saved_blocks   = get_option( 'block_visibility_manager_disabled_blocks', null );
 
-	if ( is_null( $saved_blocks ) ) {
-		// First time, use defaults.
-		$disabled_blocks = block_visibility_manager_get_default_disabled_blocks();
-	} else {
-		$disabled_blocks = $saved_blocks;
-	}
+	$disabled_blocks = is_null( $saved_blocks )
+		? block_visibility_manager_get_default_disabled_blocks()
+		: $saved_blocks;
 
 	?>
 	<div class="wrap">
 		<h1><?php esc_html_e( 'Block Visibility Settings', 'block-visibility-manager' ); ?></h1>
 		<p class="description"><?php esc_html_e( 'Control which blocks include the visibility option.', 'block-visibility-manager' ); ?></p>
 		<form method="post">
-			<?php wp_nonce_field( 'block_visibility_manager_save_settings' ); ?>
+			<?php
+			wp_nonce_field( 'bvm_save_settings', 'bvm_save_nonce' );
+			wp_nonce_field( 'bvm_reset_settings', 'bvm_reset_nonce' );
+			?>
 
 			<?php foreach ( $category_map as $slug => $label ) : ?>
 				<?php

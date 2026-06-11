@@ -21,49 +21,51 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'BLOCK_VISIBILITY_MANAGER_PLUGIN_VERSION', '1.0.0' );
 
+// Load includes at plugin load time so helpers are available to the activation hook.
+require_once plugin_dir_path( __FILE__ ) . 'includes/helpers.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/settings.php';
+
 /** Enqueue editor assets */
 function block_visibility_manager_enqueue_editor_assets() {
+	$index_js  = __DIR__ . '/build/index.js';
+	$index_css = __DIR__ . '/build/index.css';
+
 	wp_enqueue_script(
 		'block-visibility-manager-editor',
 		plugin_dir_url( __FILE__ ) . 'build/index.js',
-		array( 'wp-blocks', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data' ),
-		filemtime( __DIR__ . '/build/index.js' ),
+		array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-block-editor', 'wp-compose', 'wp-hooks', 'wp-data' ),
+		file_exists( $index_js ) ? filemtime( $index_js ) : BLOCK_VISIBILITY_MANAGER_PLUGIN_VERSION,
 		true
 	);
-
-	$role_options = block_visibility_manager_get_all_roles();
-
-	$enabled = block_visibility_manager_get_enabled_blocks();
 
 	wp_localize_script(
 		'block-visibility-manager-editor',
 		'bvmEnabledBlocks',
-		$enabled
+		block_visibility_manager_get_enabled_blocks()
 	);
 
 	wp_localize_script(
 		'block-visibility-manager-editor',
 		'bvmRoleOptions',
-		$role_options
+		block_visibility_manager_get_all_roles()
 	);
 
 	wp_enqueue_style(
 		'block-visibility-manager-editor-styles',
 		plugins_url( 'build/index.css', __FILE__ ),
 		array( 'wp-edit-blocks' ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'build/index.css' )
+		file_exists( $index_css ) ? filemtime( $index_css ) : BLOCK_VISIBILITY_MANAGER_PLUGIN_VERSION
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'block_visibility_manager_enqueue_editor_assets' );
 
 
 /**
- * Processes and renders a block.
+ * Filters block rendering to apply conditional visibility rules.
  *
- * @param string $block_content The content of the block to be processed.
- * @param array  $block An associative array containing block information.
- *
- * @return string The processed block content.
+ * @param string $block_content The block's rendered HTML.
+ * @param array  $block         Block data including attributes.
+ * @return string The (possibly empty) rendered HTML.
  */
 function block_visibility_manager_filter_render_block( $block_content, $block ) {
 	if (
@@ -74,43 +76,40 @@ function block_visibility_manager_filter_render_block( $block_content, $block ) 
 	}
 
 	$attributes = $block['attrs'] ?? array();
+	$visible    = true;
 
-	if ( empty( $attributes['bvmEnableVisibility'] ) ) {
-		return $block_content;
-	}
-
-	$visible = true;
-
-	// Time.
-	if ( ! empty( $attributes['bvmEnableTime'] ) && $attributes['bvmEnableTime'] ) {
-		$now = current_time( 'H:i' );
-
+	// Time-based visibility (server time).
+	if ( ! empty( $attributes['bvmEnableTime'] ) ) {
+		$now  = current_time( 'H:i' );
 		$from = $attributes['bvmTimeRange']['from'] ?? null;
 		$to   = $attributes['bvmTimeRange']['to'] ?? null;
 
-		if ( $from && $to ) {
-			// Format times as strings "HH:MM".
-			$time_from = sprintf( '%02d:%02d', $from['hours'], $from['minutes'] );
-			$time_to   = sprintf( '%02d:%02d', $to['hours'], $to['minutes'] );
-
-			if ( $now < $time_from || $now > $time_to ) {
+		if (
+			is_string( $from ) && is_string( $to ) &&
+			preg_match( '/^\d{2}:\d{2}$/', $from ) &&
+			preg_match( '/^\d{2}:\d{2}$/', $to )
+		) {
+			if ( $now < $from || $now > $to ) {
 				$visible = false;
 			}
 		}
 	}
 
-	// Date.
-	if ( ! empty( $attributes['bvmEnableDate'] ) && $attributes['bvmEnableDate'] ) {
-		$today = new DateTime( current_time( 'Y-m-d H:i:s' ) );
-
+	// Date-based visibility (UTC).
+	if ( ! empty( $attributes['bvmEnableDate'] ) ) {
+		$today         = new DateTime( current_time( 'Y-m-d H:i:s' ) );
 		$date_from_str = $attributes['bvmDateRange']['from'] ?? null;
 		$date_to_str   = $attributes['bvmDateRange']['to'] ?? null;
 
 		if ( $date_from_str && $date_to_str ) {
-			$date_from = new DateTime( $date_from_str );
-			$date_to   = new DateTime( $date_to_str );
+			try {
+				$date_from = new DateTime( $date_from_str );
+				$date_to   = new DateTime( $date_to_str );
 
-			if ( $today < $date_from || $today > $date_to ) {
+				if ( $today < $date_from || $today > $date_to ) {
+					$visible = false;
+				}
+			} catch ( Exception $e ) {
 				$visible = false;
 			}
 		}
@@ -120,7 +119,22 @@ function block_visibility_manager_filter_render_block( $block_content, $block ) 
 		return '';
 	}
 
-	// Device: just CSS (handled via class).
+	// User role visibility.
+	if ( ! empty( $attributes['bvmUserRoles'] ) ) {
+		if ( ! is_user_logged_in() ) {
+			if ( in_array( 'guest', $attributes['bvmUserRoles'], true ) ) {
+				return '';
+			}
+		} else {
+			$user    = wp_get_current_user();
+			$blocked = array_intersect( $attributes['bvmUserRoles'], $user->roles );
+			if ( ! empty( $blocked ) ) {
+				return '';
+			}
+		}
+	}
+
+	// Device visibility via CSS classes.
 	$classes = '';
 	if ( ! empty( $attributes['bvmHideOnMobile'] ) ) {
 		$classes .= ' hide-on-mobile';
@@ -132,73 +146,50 @@ function block_visibility_manager_filter_render_block( $block_content, $block ) 
 		$classes .= ' hide-on-desktop';
 	}
 
-	// User Roles.
-	if ( ! empty( $attributes['bvmUserRoles'] ) ) {
-		if ( ! is_user_logged_in() ) {
-			if ( in_array( 'guest', $attributes['bvmUserRoles'], true ) ) {
-				return '';
-			}
-		}
-		$user    = wp_get_current_user();
-		$blocked = array_intersect( $attributes['bvmUserRoles'], $user->roles );
-		if ( ! empty( $blocked ) ) {
-			return;
-		}
+	if ( '' === $classes ) {
+		return $block_content;
 	}
 
-	$block_content = new WP_HTML_Tag_Processor( $block_content );
-	$block_content->next_tag(); /* first tag should always be ul or ol */
-	$block_content->add_class( trim( $classes ) );
-	$block_content->get_updated_html();
-
-	return $block_content;
+	$processor = new WP_HTML_Tag_Processor( $block_content );
+	if ( $processor->next_tag() ) {
+		$processor->add_class( trim( $classes ) );
+	}
+	return $processor->get_updated_html();
 }
 add_filter( 'render_block', 'block_visibility_manager_filter_render_block', 10, 2 );
 
 /**
- * Enqueue frontend styles for the block.
+ * Enqueue frontend styles.
  */
 function block_visibility_manager_enqueue_frontend_css() {
-	wp_enqueue_style( 'block-visibility-manager-style', plugin_dir_url( __FILE__ ) . 'build/style-index.css', array(), BLOCK_VISIBILITY_MANAGER_PLUGIN_VERSION );
+	wp_enqueue_style(
+		'block-visibility-manager-style',
+		plugin_dir_url( __FILE__ ) . 'build/style-index.css',
+		array(),
+		BLOCK_VISIBILITY_MANAGER_PLUGIN_VERSION
+	);
 }
 add_action( 'wp_enqueue_scripts', 'block_visibility_manager_enqueue_frontend_css' );
 
 
 add_action( 'admin_enqueue_scripts', 'block_visibility_manager_enqueue_admin_styles' );
 /**
- * Enqueue admin styles for the Block Visibility Manager settings page.
+ * Enqueue admin styles on the plugin's settings page.
  *
- * @param string $hook The current admin page hook suffix.
+ * @param string $hook Current admin page hook suffix.
  */
 function block_visibility_manager_enqueue_admin_styles( $hook ) {
 	if ( 'settings_page_block-visibility-manager-settings' !== $hook ) {
 		return;
 	}
+	$index_css = __DIR__ . '/build/index.css';
 	wp_enqueue_style(
 		'block-visibility-manager-admin-styles',
 		plugin_dir_url( __FILE__ ) . 'build/index.css',
 		array(),
-		'1.0'
+		file_exists( $index_css ) ? filemtime( $index_css ) : BLOCK_VISIBILITY_MANAGER_PLUGIN_VERSION
 	);
 }
-
-
-/**
- * Include files if they exist.
- */
-function block_visibility_manager_include_settings_file() {
-	$file_path_to_includes = array(
-		plugin_dir_path( __FILE__ ) . 'includes/helpers.php',
-		plugin_dir_path( __FILE__ ) . 'includes/settings.php',
-	);
-
-	foreach ( $file_path_to_includes as $file_path ) {
-		if ( file_exists( $file_path ) ) {
-			require_once $file_path;
-		}
-	}
-}
-add_action( 'init', 'block_visibility_manager_include_settings_file' );
 
 
 register_activation_hook( __FILE__, 'block_visibility_manager_set_default_disabled_blocks' );

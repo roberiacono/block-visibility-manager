@@ -10,14 +10,11 @@ import {
 	PanelRow,
 	ToggleControl,
 	TextControl,
-	TimePicker,
-	DatePicker,
 	DateTimePicker,
-	__experimentalDivider as Divider,
+	Divider,
 	BaseControl,
 } from "@wordpress/components";
 import { createHigherOrderComponent } from "@wordpress/compose";
-import { select } from "@wordpress/data";
 
 const allowedBlocks = window.bvmEnabledBlocks;
 
@@ -30,23 +27,14 @@ const addAttributes = (settings, name) => {
 	settings.attributes = {
 		...settings.attributes,
 		bvmEnableVisibility: { type: "boolean", default: false },
-		bvmEnableTime: {
-			type: "boolean",
-			default: false,
-		},
-		bvmEnableDate: {
-			type: "boolean",
-			default: false,
-		},
+		bvmEnableTime: { type: "boolean", default: false },
+		bvmEnableDate: { type: "boolean", default: false },
 		bvmHideOnMobile: { type: "boolean", default: false },
 		bvmHideOnTablet: { type: "boolean", default: false },
 		bvmHideOnDesktop: { type: "boolean", default: false },
 		bvmTimeRange: {
 			type: "object",
-			default: {
-				from: { hours: 0, minutes: 0 },
-				to: { hours: 23, minutes: 59 },
-			},
+			default: { from: "00:00", to: "23:59" },
 		},
 		bvmDateRange: { type: "object", default: { from: "", to: "" } },
 		bvmUserRoles: { type: "array", default: [] },
@@ -61,6 +49,8 @@ const withInspectorControls = createHigherOrderComponent(
 		const { attributes, setAttributes, name } = props;
 		const {
 			bvmEnableVisibility,
+			bvmEnableTime,
+			bvmEnableDate,
 			bvmHideOnMobile,
 			bvmHideOnTablet,
 			bvmHideOnDesktop,
@@ -113,38 +103,32 @@ const withInspectorControls = createHigherOrderComponent(
 								<BaseControl __nextHasNoMarginBottom label="Time"></BaseControl>
 								<ToggleControl
 									label="Enable Time-based Visibility"
-									checked={attributes.bvmEnableTime}
+									checked={bvmEnableTime}
 									onChange={(value) => setAttributes({ bvmEnableTime: value })}
 								/>
-								{attributes.bvmEnableTime && (
+								{bvmEnableTime && (
 									<>
-										<TimePicker.TimeInput
+										<TextControl
+											__nextHasNoMarginBottom
 											label="Visible From"
-											value={bvmTimeRange.from}
+											type="time"
+											value={bvmTimeRange.from || "00:00"}
 											onChange={(val) =>
 												setAttributes({
-													bvmTimeRange: {
-														...bvmTimeRange,
-														from: val,
-													},
+													bvmTimeRange: { ...bvmTimeRange, from: val },
 												})
 											}
-											is12Hour={false}
 										/>
-
-										<TimePicker.TimeInput
+										<TextControl
+											__nextHasNoMarginBottom
 											label="Visible up To"
-											value={bvmTimeRange.to}
-											onChange={(val) => {
-												console.log("changed", val);
+											type="time"
+											value={bvmTimeRange.to || "23:59"}
+											onChange={(val) =>
 												setAttributes({
-													bvmTimeRange: {
-														...bvmTimeRange,
-														to: val,
-													},
-												});
-											}}
-											is12Hour={false}
+													bvmTimeRange: { ...bvmTimeRange, to: val },
+												})
+											}
 										/>
 									</>
 								)}
@@ -152,10 +136,10 @@ const withInspectorControls = createHigherOrderComponent(
 								<BaseControl __nextHasNoMarginBottom label="Date"></BaseControl>
 								<ToggleControl
 									label="Enable Date-based Visibility"
-									checked={attributes.bvmEnableDate}
+									checked={bvmEnableDate}
 									onChange={(value) => setAttributes({ bvmEnableDate: value })}
 								/>
-								{attributes.bvmEnableDate && (
+								{bvmEnableDate && (
 									<>
 										<PanelRow>
 											<div

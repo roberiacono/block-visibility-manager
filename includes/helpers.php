@@ -5,6 +5,10 @@
  * @package BlockVisibilityManager
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Get all registered block types grouped by namespace.
  */

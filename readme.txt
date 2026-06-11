@@ -6,7 +6,7 @@ Stable tag:        1.0.0
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
-Control the visibility of Gutenberg blocks based on user role, device type, date, time, and more. Enhance content flexibility by dynamically showing or hiding blocks under specific conditions.
+Control Gutenberg block visibility by user role, device, date, and time. Dynamically show or hide blocks under specific conditions.
 
 
 == Description ==

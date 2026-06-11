@@ -18,9 +18,21 @@ npm run lint:css
 # Code formatting
 npm run format
 
-# Create distributable zip
-npm run plugin-zip
+# Update translation template (.pot)
+wp i18n make-pot . languages/block-visibility-manager.pot --domain=block-visibility-manager --allow-root
+
+# Create distributable zip (versioned, includes src/ for WP.org Guideline 13)
+VERSION=$(php -r "preg_match('/Version:\s+([0-9.]+)/', file_get_contents('block-visibility-manager.php'), \$m); echo \$m[1];") && \
+cd .. && zip -r "block-visibility-manager-${VERSION}.zip" block-visibility-manager \
+  --exclude "block-visibility-manager/.git*" \
+  --exclude "block-visibility-manager/node_modules/*" \
+  --exclude "block-visibility-manager/CLAUDE.md" \
+  --exclude "block-visibility-manager/package-lock.json" \
+  --exclude "block-visibility-manager/*.zip" \
+  --exclude "block-visibility-manager/.distignore"
 ```
+
+> **Note**: `npm run plugin-zip` is not used for WP.org submissions — it uses an allowlist that omits `src/`. The manual `zip` command above includes `src/` and `package.json` as required by WP.org Plugin Review Guideline 13. The output zip lands one level up (in the `plugins/` directory).
 
 There are no automated tests in this project.
 
@@ -58,6 +70,8 @@ The option stores the *disabled* list (not the enabled list). Default disabled b
 | `src/editor.scss` | Editor-only CSS overrides |
 | `src/admin.css` | Admin settings page card grid styles |
 | `uninstall.php` | Deletes `block_visibility_manager_disabled_blocks` option on uninstall |
+| `languages/block-visibility-manager.pot` | Translation template; regenerate with `wp i18n make-pot` after string changes |
+| `.distignore` | Excludes dev-only files from the distributable zip (node_modules, CLAUDE.md, etc.) |
 
 ### Key implementation details
 

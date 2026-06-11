@@ -2,9 +2,9 @@
 /**
  * Plugin Name:       Block Visibility Manager
  * Description:       Control the visibility of Gutenberg blocks based on user role, device type, date, time, and more. Enhance content flexibility by dynamically showing or hiding blocks under specific conditions.
- * Version:           1.0.0
- * Requires at least: 6.8
- * Requires PHP:      7.4
+ * Version:           1.0.1
+ * Requires at least: 6.2
+ * Requires PHP:      7.2
  * Author:            Roberto Iacono
  * Author URI:        https://robertoiacono.it
  * License:           GPL-2.0-or-later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'BLOCK_VISIBILITY_MANAGER_PLUGIN_VERSION', '1.0.0' );
+define( 'BLOCK_VISIBILITY_MANAGER_PLUGIN_VERSION', '1.0.1' );
 
 // Load includes at plugin load time so helpers are available to the activation hook.
 require_once plugin_dir_path( __FILE__ ) . 'includes/helpers.php';

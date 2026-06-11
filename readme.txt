@@ -1,8 +1,10 @@
 === Block Visibility Manager ===
 Contributors:      prototipo88
 Tags:              visibility, block visibility, block, block editor, gutenberg
+Requires at least: 6.2
 Tested up to:      7.0
-Stable tag:        1.0.0
+Requires PHP:      7.2
+Stable tag:        1.0.1
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -114,6 +116,11 @@ No. It uses **WordPress core components** and no custom frontend JavaScript.
 6. Example: Hide banner on mobile.
 
 == Changelog ==
+
+= 1.0.1 =
+* Security and logic bug fixes
+* Fixed deprecated API usage
+* Added settings link on the Plugins page
 
 = 1.0.0 =
 * Release

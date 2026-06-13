@@ -4,7 +4,7 @@ Tags:              visibility, block visibility, block, block editor, gutenberg
 Requires at least: 6.2
 Tested up to:      7.0
 Requires PHP:      7.2
-Stable tag:        1.0.1
+Stable tag:        1.0.2
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -116,6 +116,9 @@ No. It uses **WordPress core components** and no custom frontend JavaScript.
 6. Example: Hide banner on mobile.
 
 == Changelog ==
+
+= 1.0.2 =
+* Fixed 400 Bad Request error on block-renderer REST API for server-side rendered (dynamic) blocks
 
 = 1.0.1 =
 * Security and logic bug fixes

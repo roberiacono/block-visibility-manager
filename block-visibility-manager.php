@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Block Visibility Manager
  * Description:       Control the visibility of Gutenberg blocks based on user role, device type, date, time, and more. Enhance content flexibility by dynamically showing or hiding blocks under specific conditions.
- * Version:           1.0.1
+ * Version:           1.0.2
  * Requires at least: 6.2
  * Requires PHP:      7.2
  * Author:            Roberto Iacono
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'BLOCK_VISIBILITY_MANAGER_PLUGIN_VERSION', '1.0.1' );
+define( 'BLOCK_VISIBILITY_MANAGER_PLUGIN_VERSION', '1.0.2' );
 
 // Load includes at plugin load time so helpers are available to the activation hook.
 require_once plugin_dir_path( __FILE__ ) . 'includes/helpers.php';
@@ -157,6 +157,49 @@ function block_visibility_manager_filter_render_block( $block_content, $block ) 
 	return $processor->get_updated_html();
 }
 add_filter( 'render_block', 'block_visibility_manager_filter_render_block', 10, 2 );
+
+/**
+ * Register bvm* attributes server-side for every enabled block so the
+ * block-renderer REST endpoint accepts them without returning a 400.
+ *
+ * @param array  $args       Block type registration args.
+ * @param string $block_type Block name (e.g. "core/paragraph").
+ * @return array
+ */
+function block_visibility_manager_register_attributes( $args, $block_type ) {
+	// Skip blocks hidden from the Inserter — JS never shows bvm controls on them.
+	if ( isset( $args['supports']['inserter'] ) && false === $args['supports']['inserter'] ) {
+		return $args;
+	}
+
+	// Skip blocks the admin has explicitly disabled.
+	// NOTE: we cannot use block_visibility_manager_get_enabled_blocks() here because
+	// that function queries WP_Block_Type_Registry, and the block currently being
+	// registered is not yet in the registry when this filter fires — so the enabled
+	// list would never contain it, causing bvm* attributes to be silently skipped for
+	// every block. Reading the disabled option directly avoids this timing problem.
+	$disabled_blocks = get_option( 'block_visibility_manager_disabled_blocks', array() );
+	if ( is_array( $disabled_blocks ) && in_array( $block_type, $disabled_blocks, true ) ) {
+		return $args;
+	}
+
+	if ( ! isset( $args['attributes'] ) ) {
+		$args['attributes'] = array();
+	}
+	$args['attributes'] = array_merge( $args['attributes'], array(
+		'bvmEnableVisibility' => array( 'type' => 'boolean', 'default' => false ),
+		'bvmEnableTime'       => array( 'type' => 'boolean', 'default' => false ),
+		'bvmEnableDate'       => array( 'type' => 'boolean', 'default' => false ),
+		'bvmHideOnMobile'     => array( 'type' => 'boolean', 'default' => false ),
+		'bvmHideOnTablet'     => array( 'type' => 'boolean', 'default' => false ),
+		'bvmHideOnDesktop'    => array( 'type' => 'boolean', 'default' => false ),
+		'bvmTimeRange'        => array( 'type' => 'object', 'default' => array() ),
+		'bvmDateRange'        => array( 'type' => 'object', 'default' => array() ),
+		'bvmUserRoles'        => array( 'type' => 'array',  'default' => array(), 'items' => array( 'type' => 'string' ) ),
+	) );
+	return $args;
+}
+add_filter( 'register_block_type_args', 'block_visibility_manager_register_attributes', 10, 2 );
 
 /**
  * Enqueue frontend styles.
